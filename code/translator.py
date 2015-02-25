@@ -31,10 +31,12 @@ nGramForBLEU = 3
 def parseTrainFile(filename):
     spanishSentences = []
     englishSentences = []
+    rawEnglishSentences = []
     prevLine = 'English'
     f = open(filename)
     for line in f:
         if line[0] is '#': continue
+        if line and prevLine is 'Spanish': rawEnglishSentences.append(line)
         exclude = set(string.punctuation)
         sentence = ''.join(ch for ch in line if ch not in exclude)
         sentence = sentence.strip('¡¿').lower().split()
@@ -45,7 +47,7 @@ def parseTrainFile(filename):
         elif prevLine is 'Spanish':
             englishSentences.append(sentence)
             prevLine = 'English'
-    return (spanishSentences, englishSentences)
+    return (spanishSentences, englishSentences, rawEnglishSentences)
 
 # Parses the dictionary given in dict.txt
 # Format is 'EnglishWord:SpanishWord', all lowercase
@@ -134,12 +136,13 @@ def unPosTagTranslations(taggedEnglishTranslations):
 # Method walks through each transation and prints the Spanish sentence, the machine translation
 # and the correct translation as well as the BLEU score of the translation.
 
-def printTranslations(spanishSentences, englishTranslations, englishSentences, bScores, directTranslationBScores):
+def printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishTranslations, bScores, directTranslationBScores):
     for idx, sentence in enumerate(englishTranslations):
         print "============= New Translation ============="
         print "Translation of: ", " ".join(spanishSentences[idx])
         print "Translation: ", " ".join(sentence)
         print "Correct Translation: ", " ".join(englishSentences[idx])
+        print "Raw Correct Translation: ", rawEnglishTranslations[idx]
         print "Direct Translation BLEU-", nGramForBLEU," Score: ", directTranslationBScores[idx]
         print "Final BLEU-", nGramForBLEU," Score: ", bScores[idx]
 
@@ -173,7 +176,7 @@ def computeBLEU(englishTranslations, englishSentences, n):
     return bScores
 
 def main():
-    spanishSentences, englishSentences = parseTrainFile(devFile)
+    spanishSentences, englishSentences, rawEnglishSentences = parseTrainFile(devFile)
     dictionary = parseDict(dictFile)
 
     # Pre-processing methods
@@ -191,7 +194,7 @@ def main():
 
     # Scoring
     bScores = computeBLEU(englishTranslations, englishSentences, nGramForBLEU)
-    printTranslations(spanishSentences, englishTranslations, englishSentences, bScores, directTranslationBScores)
+    printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishSentences, bScores, directTranslationBScores)
 
 # Run
 main()
