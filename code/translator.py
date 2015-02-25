@@ -9,6 +9,10 @@ import re
 import string
 import nltk
 
+# Set system for utf-8 endocding
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 # ======== GLOBALS ==========
 devFile = '../corpus/dev.txt'
 testFile = '../corpus/test.txt'
@@ -32,22 +36,27 @@ def parseTrainFile(filename):
     spanishSentences = []
     englishSentences = []
     rawEnglishSentences = []
+    rawSpanishSentences = []
     prevLine = 'English'
     f = open(filename)
     for line in f:
         if line[0] is '#': continue
-        if line and prevLine is 'Spanish': rawEnglishSentences.append(line)
-        exclude = set(string.punctuation)
-        sentence = ''.join(ch for ch in line if ch not in exclude)
-        sentence = sentence.strip('¡¿').lower().split()
+        raw_line = line
+
+# Pre-processing strategy #1: Throw out Spanish punctuation
+        line = line.strip('¡¿')
+
+        sentence = nltk.word_tokenize(line)
         if not sentence: continue
         if prevLine is 'English':
+            rawSpanishSentences.append(raw_line)
             spanishSentences.append(sentence)
             prevLine = 'Spanish'
         elif prevLine is 'Spanish':
+            rawEnglishSentences.append(raw_line)
             englishSentences.append(sentence)
             prevLine = 'English'
-    return (spanishSentences, englishSentences, rawEnglishSentences)
+    return (spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences)
 
 # Parses the dictionary given in dict.txt
 # Format is 'EnglishWord:SpanishWord', all lowercase
@@ -72,13 +81,13 @@ def directTranslate(spanishSentences, dictionary):
         translatedSentence = []
         for word in sentence:
             if word in dictionary: translatedSentence.append(dictionary[word])
+            elif word.lower() in dictionary: translatedSentence.append(dictionary[word.lower()])
             # Catches Numbers for now, might need to change this to check that it's numeric first
             else: translatedSentence.append(word)
         translations.append(translatedSentence)
     return translations
 
 # ============= Pre-Processing Methods ============== #
-
 
 
 # =================================================== #
@@ -136,12 +145,16 @@ def unPosTagTranslations(taggedEnglishTranslations):
 # Method walks through each transation and prints the Spanish sentence, the machine translation
 # and the correct translation as well as the BLEU score of the translation.
 
-def printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishTranslations, bScores, directTranslationBScores):
+def printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishTranslations, rawSpanishSentences, bScores, directTranslationBScores):
+    print "\n\n"
+    print "================ TRANSLATIONS =================="
+    print "\n\n"
     for idx, sentence in enumerate(englishTranslations):
         print "============= New Translation ============="
         print "Translation of: ", " ".join(spanishSentences[idx])
         print "Translation: ", " ".join(sentence)
         print "Correct Translation: ", " ".join(englishSentences[idx])
+        print "Raw Spanish Sentence: ", rawSpanishSentences[idx]
         print "Raw Correct Translation: ", rawEnglishTranslations[idx]
         print "Direct Translation BLEU-", nGramForBLEU," Score: ", directTranslationBScores[idx]
         print "Final BLEU-", nGramForBLEU," Score: ", bScores[idx]
@@ -176,7 +189,7 @@ def computeBLEU(englishTranslations, englishSentences, n):
     return bScores
 
 def main():
-    spanishSentences, englishSentences, rawEnglishSentences = parseTrainFile(devFile)
+    spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences = parseTrainFile(devFile)
     dictionary = parseDict(dictFile)
 
     # Pre-processing methods
@@ -194,7 +207,7 @@ def main():
 
     # Scoring
     bScores = computeBLEU(englishTranslations, englishSentences, nGramForBLEU)
-    printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishSentences, bScores, directTranslationBScores)
+    printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishSentences, rawSpanishSentences, bScores, directTranslationBScores)
 
 # Run
 main()
