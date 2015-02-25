@@ -8,9 +8,11 @@ import sets
 import re
 import string
 
-devFile = 'dev.txt'
-testFile = 'test.txt'
-dictFile = 'dict.txt'
+devFile = '../corpus/dev.txt'
+testFile = '../corpus/test.txt'
+dictFile = '../dic/dict.txt'
+
+nGramForBLEU = 3
 
 
 # Parses the training file given in dev.txt
@@ -62,22 +64,54 @@ def directTranslate(spanishSentences, dictionary):
         translatedSentence = []
         for word in sentence:
             if word in dictionary: translatedSentence.append(dictionary[word])
+            # Catches Numbers for now, might need to change this to check that it's numeric first
+            else: translatedSentence.append(word)
         translations.append(translatedSentence)
     return translations
 
-def printTranslations(spanishSentences, englishTranslations, englishSentences):
+def printTranslations(spanishSentences, englishTranslations, englishSentences, bScores):
     for idx, sentence in enumerate(englishTranslations):
         print "============= New Translation ============="
         print "Translation of: ", " ".join(spanishSentences[idx])
         print "Translation: ", " ".join(sentence)
         print "Correct Translation: ", " ".join(englishSentences[idx])
+        print "BLEU-", nGramForBLEU," Score: ", bScores[idx]
 
+# Method computes the BLEU score for all Translations given in the list englishTranslations
+# when compared against the correct translation given by englishSentences. Uses n-grams given
+# by the input variable n.
+
+# Returns a list of BLEU scores corresponding to the translations given in englishTranslations
+
+def computeBLEU(englishTranslations, englishSentences, n):
+    bScores = []
+    for idx, sentence in enumerate(englishTranslations):
+        score = min(1.0, float(len(sentence)) / float(len(englishSentences[idx])))
+        for i in range(1, n+1):
+            translation = englishTranslations[idx]
+            correctTranslation = englishSentences[idx]
+            n_gram_count = len(translation) + 1 - i
+            ref_count = 0.0
+            matches = {}
+            for pos in range(n_gram_count):
+                substr = ' '.join(translation[pos: pos+i])
+                if substr in matches:
+                    matches[substr] += 1.0
+                    if ' '.join(correctTranslation).count(substr) >= matches[substr]:
+                        ref_count += 1.0
+                elif substr in ' '.join(correctTranslation):
+                    ref_count += 1.0
+                    matches[substr] = 1
+            score *= ref_count / n_gram_count
+        bScores.append(score)
+    return bScores
 
 def main():
     spanishSentences, englishSentences = parseTrainFile(devFile)
     dictionary = parseDict(dictFile)
     englishTranslations = directTranslate(spanishSentences, dictionary)
-    printTranslations(spanishSentences, englishTranslations, englishSentences)
+    bScores = computeBLEU(englishTranslations, englishSentences, nGramForBLEU)
+    printTranslations(spanishSentences, englishTranslations, englishSentences, bScores)
 
 # Run
 main()
