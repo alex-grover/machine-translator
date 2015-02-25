@@ -32,7 +32,7 @@ dijeron:said
 dijo:said
 dirigida:directed
 disfrutan:enjoy
-dolorida:Sore
+dolorida:sore
 droga:drug
 drogarse:drugging
 efecto:effect
