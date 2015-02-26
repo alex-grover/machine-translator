@@ -106,7 +106,13 @@ def directTranslate(spanishSentences, dictionary):
 def nounAdjectiveSwap(taggedEnglishTranslations):
     updatedTranslations = []
     for sentence in taggedEnglishTranslations:
+        prev = False
         for idx in range(1, len(sentence)):
+            # Check if previous word was swapped, i.e. the word I'm looking at was just
+            # swapped into this position
+            if prev:
+                prev = False
+                continue
             # Check if Adjective (JJ) is following a noun (NN)
             if 'NN' in sentence[idx-1][1] and 'JJ' in sentence[idx][1]:
                 # If it's following a verb, don't swap
@@ -115,8 +121,34 @@ def nounAdjectiveSwap(taggedEnglishTranslations):
                 swapWord = sentence[idx-1]
                 sentence[idx-1] = sentence[idx]
                 sentence[idx] = swapWord
+                prev = True
         updatedTranslations.append(sentence)
     return updatedTranslations
+
+# Post-Process #2:
+
+# Spanish uses the negation (e.g. the word 'no') before the verb whereas
+# it is used following the verb in English (e.g. 'is not')
+
+def verbNegation(taggedEnglishTranslations):
+    updatedTranslations = []
+    for sentence in taggedEnglishTranslations:
+        prev = False
+        for idx in range(1, len(sentence)):
+            # Check if previous word was swapped, i.e. the word I'm looking at was just
+            # swapped into this position
+            if prev:
+                prev = False
+                continue
+            # Check if 'no' is following a verb
+            if 'no' == sentence[idx-1][0] and ('VB' in sentence[idx][1] or 'MD' in sentence[idx][1]):
+                swap = sentence[idx - 1]
+                sentence[idx - 1] = sentence[idx]
+                sentence[idx] = ('not', swap[1])
+                prev = True
+        updatedTranslations.append(sentence)
+    return updatedTranslations
+
 
 
 # =================================================== #
@@ -145,14 +177,16 @@ def unPosTagTranslations(taggedEnglishTranslations):
 # Method walks through each transation and prints the Spanish sentence, the machine translation
 # and the correct translation as well as the BLEU score of the translation.
 
-def printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishTranslations, rawSpanishSentences, bScores, directTranslationBScores):
+def printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishTranslations, rawSpanishSentences, bScores, directTranslationBScores, taggedEnglishTranslations):
     print "\n\n"
     print "================ TRANSLATIONS =================="
     print "\n\n"
     for idx, sentence in enumerate(englishTranslations):
-        print "============= New Translation ============="
+        print
+        print "============= New Translation: {0} =============".format(idx + 1)
         print "Translation of: ", " ".join(spanishSentences[idx])
         print "Translation: ", " ".join(sentence)
+        print "Tagged Translation: ", taggedEnglishTranslations[idx]
         print "Correct Translation: ", " ".join(englishSentences[idx])
         print "Raw Spanish Sentence: ", rawSpanishSentences[idx]
         print "Raw Correct Translation: ", rawEnglishTranslations[idx]
@@ -202,12 +236,13 @@ def main():
     taggedEnglishTranslations = posTagTranslations(englishTranslations)
 
     taggedEnglishTranslations = nounAdjectiveSwap(taggedEnglishTranslations)
+    taggedEnglishTranslations = verbNegation(taggedEnglishTranslations)
     
     englishTranslations = unPosTagTranslations(taggedEnglishTranslations)
 
     # Scoring
     bScores = computeBLEU(englishTranslations, englishSentences, nGramForBLEU)
-    printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishSentences, rawSpanishSentences, bScores, directTranslationBScores)
+    printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishSentences, rawSpanishSentences, bScores, directTranslationBScores, taggedEnglishTranslations)
 
 # Run
 main()
