@@ -55,15 +55,14 @@ def parseTrainFile(filename):
         if line[0] is '#':
             continue
 
+        # Pre-processing strategy #1: Throw out Spanish punctuation
+        raw_line = line
+        line = line.strip('¡¿')
+
         # Tokenize word using NLTK and ignore empty lines
         sentence = nltk.word_tokenize(line)
         if not sentence:
             continue
-
-        raw_line = line
-
-        # Pre-processing strategy #1: Throw out Spanish punctuation
-        line = line.strip('¡¿')
 
         if prevLine is 'English':
             rawSpanishSentences.append(raw_line)
@@ -75,11 +74,28 @@ def parseTrainFile(filename):
             prevLine = 'English'
     return (spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences)
 
+# Method is a baseline direct translate, simply swaps each word for the first available word
+# in the dictionary
+
+def directTranslate(spanishSentences, dictionary):
+    translations = []
+    for sentence in spanishSentences:
+        translatedSentence = []
+        for i, word in enumerate(sentence):
+            word = word.lower()
+            if word in dictionary:
+                translatedSentence.append(dictionary[word])
+            else:
+                translatedSentence.append(word)
+        translations.append(translatedSentence)
+    return translations
+
+
 
 # Returns a list of lists with a direct translation from Spanish to English
 # i.e. returns a sentence for which each Spanish word is replaced with its
 # English translation
-def directTranslate(spanishSentences, dictionary):
+def translate(spanishSentences, dictionary):
     translations = []
 
     for sentence in spanishSentences:
@@ -379,7 +395,7 @@ def main():
     directEnglishTranslations = directTranslate(spanishSentences, dictionary)
     directTranslationBScores = computeBLEU(directEnglishTranslations, englishSentences)
 
-    englishTranslations = directTranslate(modifiedSpanishSentences, dictionary)
+    englishTranslations = translate(modifiedSpanishSentences, dictionary)
 
 
     # Post-processing methods
