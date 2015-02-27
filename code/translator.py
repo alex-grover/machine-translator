@@ -318,9 +318,9 @@ def main():
     dictionary = parseDict(dictFile)
     spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences = parseTrainFile(translateFile)
 
+    # Pre-processing methods
     taggedSpanishSentences = spanishPosTag(spanishTagger, spanishSentences) 
 
-    # Pre-processing methods
     taggedSpanishSentences = spanishNounAdjectiveSwap(taggedSpanishSentences)
 
     modifiedSpanishSentences = spanishUnPosTag(taggedSpanishSentences)
