@@ -269,8 +269,20 @@ def aConsonantCorrection(taggedEnglishTranslations):
 
             # if word is a, check next word to see if it begins with a vowel
             if word == 'a' and isVowel(nextWord[0]):
-                sentence[i] = 'an'
+                sentence[i] = ('an', sentence[i][1])
 
+        updatedTranslations.append(sentence)
+
+    return updatedTranslations
+
+# Post-Process #4
+
+def capitalizeFirstWord(taggedEnglishTranslations):
+    updatedTranslations = []
+
+    for sentence in taggedEnglishTranslations:
+        if len(sentence) > 0:
+            sentence[0] = (sentence[0][0].capitalize(), sentence[0][1])
         updatedTranslations.append(sentence)
 
     return updatedTranslations
@@ -376,6 +388,7 @@ def main():
     taggedEnglishTranslations = nounAdjectiveSwap(taggedEnglishTranslations)
     taggedEnglishTranslations = verbNegation(taggedEnglishTranslations)
     taggedEnglishTranslations = aConsonantCorrection(taggedEnglishTranslations)
+    taggedEnglishTranslations = capitalizeFirstWord(taggedEnglishTranslations)
 
     englishTranslations = unPosTagTranslations(taggedEnglishTranslations)
 
