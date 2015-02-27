@@ -19,6 +19,12 @@ sys.setdefaultencoding("utf-8")
 # each translation.
 nGramForBLEU = 2
 
+#================== Helper Methods ===================#
+# Returns true if character c is a vowel, false if not
+def isVowel(c):
+    return c == 'a' or c == 'e' or c == 'i' or c == 'o' or c == 'u'
+
+
 
 # Parses the dictionary passed in.
 # Format is 'EnglishWord:SpanishWord', all lowercase
@@ -35,8 +41,7 @@ def parseDict(filename):
 
 # Parses the training file passed in. Returns a list of sentences,
 # where each sentence is given as a list of the words in that sentence.
-# Strips all punctuation (both English and Spanish) and converts to
-# lower case.
+# Uses NLTK word tokenizer to parse the file.
 def parseTrainFile(filename):
     spanishSentences = []
     englishSentences = []
@@ -80,9 +85,22 @@ def directTranslate(spanishSentences, dictionary):
     for sentence in spanishSentences:
         translatedSentence = []
 
-        for word in sentence:
+        for i, word in enumerate(sentence):
             word = word.lower()
-            if word in dictionary:
+
+            if word == 'lo':
+                # lo que -> what, so disregard 'lo'
+                if len(sentence) > i+1 and sentence[i+1] == 'que':
+                    continue
+
+            if word == 'que':
+                if i == 0 or sentence[i-1] == 'lo':
+                    translatedSentence.append('what')
+                elif sentence[i-1] == 'persona' or sentence[i-1] == 'personas' or sentence[i-1] == 'gente':
+                    translatedSentence.append('who')
+                else:
+                    translatedSentence.append('that')
+            elif word in dictionary:
                 translatedSentence.append(dictionary[word])
             else:
                 translatedSentence.append(word)
@@ -237,6 +255,38 @@ def verbNegation(taggedEnglishTranslations):
 
     return updatedTranslations
 
+# Post-Process #3:
+
+# Multiple words in Spanish ("un", "una") translate into "a" in english. However,
+# in english, "a" should become "an" if it is followed by a word beginning with a vowel
+def aConsonantCorrection(taggedEnglishTranslations):
+    updatedTranslations = []
+
+    for sentence in taggedEnglishTranslations:
+        for i in range(0, len(sentence) - 1):
+            word = sentence[i][0]
+            nextWord = sentence[i + 1][0]
+
+            # if word is a, check next word to see if it begins with a vowel
+            if word == 'a' and isVowel(nextWord[0]):
+                sentence[i] = ('an', sentence[i][1])
+
+        updatedTranslations.append(sentence)
+
+    return updatedTranslations
+
+# Post-Process #4
+
+def capitalizeFirstWord(taggedEnglishTranslations):
+    updatedTranslations = []
+
+    for sentence in taggedEnglishTranslations:
+        if len(sentence) > 0:
+            sentence[0] = (sentence[0][0].capitalize(), sentence[0][1])
+        updatedTranslations.append(sentence)
+
+    return updatedTranslations
+
 
 # =================================================== #
 
@@ -247,7 +297,7 @@ def spanishPosTag(spanishTagger, spanishSentences):
         posTaggedSentences.append(spanishTagger.tagSentence(sentence))
         print 'Spanish Tagged Sentence: ', posTaggedSentences[-1]
     return posTaggedSentences
- 
+
 def spanishUnPosTag(spanishTagSentences):
     spanishSentences = []
     for tagged_sentence in spanishTagSentences:
@@ -257,7 +307,7 @@ def spanishUnPosTag(spanishTagSentences):
         spanishSentences.append(sentence)
     return spanishSentences
 
-       
+
 
 # Method takes a list of English Translation sentences and
 # returns a POS tagged sentence.
@@ -337,6 +387,8 @@ def main():
 
     taggedEnglishTranslations = nounAdjectiveSwap(taggedEnglishTranslations)
     taggedEnglishTranslations = verbNegation(taggedEnglishTranslations)
+    taggedEnglishTranslations = aConsonantCorrection(taggedEnglishTranslations)
+    taggedEnglishTranslations = capitalizeFirstWord(taggedEnglishTranslations)
 
     englishTranslations = unPosTagTranslations(taggedEnglishTranslations)
 

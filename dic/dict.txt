@@ -98,7 +98,7 @@ pineal:pineal
 poco:little
 podía:could
 por:by
-porque:why
+porque:because
 profunda:deep
 programa:program
 psicosis:psychosis
@@ -129,8 +129,8 @@ tener:have
 tienen:have
 tipo:type
 todos:all
-un:one
-una:one
+un:a
+una:a
 uso:use
 utilizan:used
 video:video
