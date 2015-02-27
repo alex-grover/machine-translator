@@ -129,8 +129,8 @@ tener:have
 tienen:have
 tipo:type
 todos:all
-un:one
-una:one
+un:a
+una:a
 uso:use
 utilizan:used
 video:video
