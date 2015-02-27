@@ -85,9 +85,22 @@ def directTranslate(spanishSentences, dictionary):
     for sentence in spanishSentences:
         translatedSentence = []
 
-        for word in sentence:
+        for i, word in enumerate(sentence):
             word = word.lower()
-            if word in dictionary:
+
+            if word == 'lo':
+                # lo que -> what, so disregard 'lo'
+                if len(sentence) > i+1 and sentence[i+1] == 'que':
+                    continue
+
+            if word == 'que':
+                if i == 0 or sentence[i-1] == 'lo':
+                    translatedSentence.append('what')
+                elif sentence[i-1] == 'persona' or sentence[i-1] == 'personas' or sentence[i-1] == 'gente':
+                    translatedSentence.append('who')
+                else:
+                    translatedSentence.append('that')
+            elif word in dictionary:
                 translatedSentence.append(dictionary[word])
             else:
                 translatedSentence.append(word)
@@ -272,7 +285,7 @@ def spanishPosTag(spanishTagger, spanishSentences):
         posTaggedSentences.append(spanishTagger.tagSentence(sentence))
         print 'Spanish Tagged Sentence: ', posTaggedSentences[-1]
     return posTaggedSentences
- 
+
 def spanishUnPosTag(spanishTagSentences):
     spanishSentences = []
     for tagged_sentence in spanishTagSentences:
@@ -282,7 +295,7 @@ def spanishUnPosTag(spanishTagSentences):
         spanishSentences.append(sentence)
     return spanishSentences
 
-       
+
 
 # Method takes a list of English Translation sentences and
 # returns a POS tagged sentence.
@@ -343,7 +356,7 @@ def main():
     dictionary = parseDict(dictFile)
     spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences = parseTrainFile(translateFile)
 
-    taggedSpanishSentences = spanishPosTag(spanishTagger, spanishSentences) 
+    taggedSpanishSentences = spanishPosTag(spanishTagger, spanishSentences)
 
     # Pre-processing methods
     taggedSpanishSentences = spanishNounAdjectiveSwap(taggedSpanishSentences)
