@@ -22,7 +22,7 @@ nGramForBLEU = 2
 #================== Helper Methods ===================#
 # Returns true if character c is a vowel, false if not
 def isVowel(c):
-    return c == 'a' or c == 'e' or c == 'i' or c == 'o' or c == 'u' 
+    return c == 'a' or c == 'e' or c == 'i' or c == 'o' or c == 'u'
 
 
 

@@ -98,7 +98,7 @@ pineal:pineal
 poco:little
 podía:could
 por:by
-porque:why
+porque:because
 profunda:deep
 programa:program
 psicosis:psychosis
