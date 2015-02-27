@@ -9,13 +9,15 @@ import re
 import string
 import nltk
 
+from spanishTagger import SpanishTagger
+
 # Set system for utf-8 endocding
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
 # Variable gives the n-gram used in computation of the BLEU score for
 # each translation.
-nGramForBLEU = 3
+nGramForBLEU = 2
 
 
 # Parses the dictionary passed in.
@@ -127,6 +129,42 @@ def computeBLEU(englishTranslations, englishSentences):
 
 # ============= Pre-Processing Methods ============== #
 
+# Pre-Process #1:
+
+# Method looks for any nouns followed by adjectives in the Spanish
+# and swaps them unless it's following a verb because we noticed that it
+# is the one case where we actually don't want to swap them.
+
+def spanishNounAdjectiveSwap(taggedSpanishSentences):
+    updatedSentences = []
+
+    for sentence in taggedSpanishSentences:
+        prev = False
+
+        for i in xrange(1, len(sentence)):
+            # Check if previous word was swapped, i.e. the word
+            # I'm looking at was just swapped into this position
+            if prev:
+                prev = False
+                continue
+
+            # Check if Adjective (JJ) is following a noun (NN)
+            if sentence[i-1][1] and sentence[i][1] and sentence[i - 1][1][0] == 'n' and sentence[i][1][0] == 'a':
+                # If it's following a verb, don't swap
+                if sentence[i - 2] and sentence[i-2][1] and sentence[i - 2][1][0] == 'v':
+                    continue
+
+                # Otherwise, swap the two words
+                print "Swapping Adjective-Noun in Spanish in: ", sentence
+                swapWord = sentence[i - 1]
+                sentence[i - 1] = sentence[i]
+                sentence[i] = swapWord
+                prev = True
+
+        updatedSentences.append(sentence)
+
+    return updatedSentences
+
 
 # =================================================== #
 
@@ -203,6 +241,24 @@ def verbNegation(taggedEnglishTranslations):
 # =================================================== #
 
 
+def spanishPosTag(spanishTagger, spanishSentences):
+    posTaggedSentences = []
+    for sentence in spanishSentences:
+        posTaggedSentences.append(spanishTagger.tagSentence(sentence))
+        print 'Spanish Tagged Sentence: ', posTaggedSentences[-1]
+    return posTaggedSentences
+ 
+def spanishUnPosTag(spanishTagSentences):
+    spanishSentences = []
+    for tagged_sentence in spanishTagSentences:
+        sentence = []
+        for word, tag in tagged_sentence:
+            sentence.append(word)
+        spanishSentences.append(sentence)
+    return spanishSentences
+
+       
+
 # Method takes a list of English Translation sentences and
 # returns a POS tagged sentence.
 def posTagTranslations(englishTranslations):
@@ -229,7 +285,7 @@ def unPosTagTranslations(taggedEnglishTranslations):
 # Method walks through each transation and prints the Spanish
 # sentence, the machine translation and the correct translation
 # as well as the BLEU score of the translation.
-def printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishTranslations, rawSpanishSentences, bScores, directTranslationBScores, taggedEnglishTranslations):
+def printTranslations(spanishSentences, englishTranslations, englishSentences, directEnglishTranslations, rawEnglishTranslations, rawSpanishSentences, bScores, directTranslationBScores, taggedEnglishTranslations):
     print "\n\n"
     print "================ TRANSLATIONS =================="
     print "\n\n"
@@ -238,13 +294,16 @@ def printTranslations(spanishSentences, englishTranslations, englishSentences, r
         print "============= New Translation: {0} =============".format(i + 1)
         print "Translation of: ", " ".join(spanishSentences[i])
         print "Translation: ", " ".join(sentence)
-        print "Tagged Translation: ", taggedEnglishTranslations[i]
         print "Correct Translation: ", " ".join(englishSentences[i])
         print "Raw Spanish Sentence: ", rawSpanishSentences[i]
         print "Raw Correct Translation: ", rawEnglishTranslations[i]
+        print "Direct Translation: ", " ".join(directEnglishTranslations[i])
         print "Direct Translation BLEU-", nGramForBLEU," Score: ", directTranslationBScores[i]
         print "Final BLEU-", nGramForBLEU," Score: ", bScores[i]
-
+        print "Tagged Translation: ", taggedEnglishTranslations[i]
+    print "Summary: "
+    for i in range(len(englishTranslations)):
+        print "Sentence: ", i+1, " Direct Translation Score: ", directTranslationBScores[i], " vs. Final Score: ", bScores[i]
 
 def main():
     if len(sys.argv) != 3:
@@ -254,15 +313,23 @@ def main():
     dictFile = sys.argv[1]
     translateFile = sys.argv[2]
 
+    spanishTagger = SpanishTagger()
+
     dictionary = parseDict(dictFile)
     spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences = parseTrainFile(translateFile)
 
-    # Pre-processing methods
+    taggedSpanishSentences = spanishPosTag(spanishTagger, spanishSentences) 
 
+    # Pre-processing methods
+    taggedSpanishSentences = spanishNounAdjectiveSwap(taggedSpanishSentences)
+
+    modifiedSpanishSentences = spanishUnPosTag(taggedSpanishSentences)
 
     # Direct Translation
-    englishTranslations = directTranslate(spanishSentences, dictionary)
-    directTranslationBScores = computeBLEU(englishTranslations, englishSentences)
+    directEnglishTranslations = directTranslate(spanishSentences, dictionary)
+    directTranslationBScores = computeBLEU(directEnglishTranslations, englishSentences)
+
+    englishTranslations = directTranslate(modifiedSpanishSentences, dictionary)
 
 
     # Post-processing methods
@@ -276,7 +343,7 @@ def main():
 
     # Scoring
     bScores = computeBLEU(englishTranslations, englishSentences)
-    printTranslations(spanishSentences, englishTranslations, englishSentences, rawEnglishSentences, rawSpanishSentences, bScores, directTranslationBScores, taggedEnglishTranslations)
+    printTranslations(spanishSentences, englishTranslations, englishSentences, directEnglishTranslations, rawEnglishSentences, rawSpanishSentences, bScores, directTranslationBScores, taggedEnglishTranslations)
 
 
 if __name__ == '__main__':
