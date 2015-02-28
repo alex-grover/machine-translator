@@ -10,7 +10,10 @@ import string
 import nltk
 
 from spanishTagger import SpanishTagger
+from HolbrookCorpus import HolbrookCorpus
 from StupidBackoffLanguageModel import StupidBackoffLanguageModel
+from LaplaceBigramLanguageModel import LaplaceBigramLanguageModel
+from UnigramLanguageModel import UnigramLanguageModel
 
 # Set system for utf-8 endocding
 reload(sys)
@@ -302,9 +305,9 @@ def articleCorrection(englishTranslations, englishModel):
     for sentence in englishTranslations:
         for idx, word in enumerate(sentence):
             if word == 'the':
-                if englishModel.score(sentence) < english.Model(sentence[0,i]+sentence[i+1,len(sentence)]):
-                    sentence.pop(idx)
-        updatedSentences.append(sentences)
+                if englishModel.score(sentence) < englishModel.score(sentence[0:idx]+sentence[idx+1:len(sentence)]):
+                    del sentence[idx]
+        updatedSentences.append(sentence)
 
     return updatedSentences
                 
@@ -316,7 +319,7 @@ def capitalizeFirstWord(englishTranslations):
 
     for sentence in englishTranslations:
         if len(sentence) > 0:
-            sentence[0] = sentence[0].capitalize
+            sentence[0] = sentence[0].capitalize()
         updatedTranslations.append(sentence)
 
     return updatedTranslations
@@ -401,7 +404,11 @@ def main():
     spanishTagger = SpanishTagger()
 
     # TODO: Need to create HolbrookCorpus Class using HolbrookCorpus.txt
-    englishModel = StupidBackoffLanguageModel('HolbrookCorpus.py')
+    trainPath = '../data/holbrook-tagged-train.dat'
+    trainingCorpus = HolbrookCorpus(trainPath)
+#    englishModel = StupidBackoffLanguageModel(trainingCorpus)
+    englishModel = LaplaceBigramLanguageModel(trainingCorpus)
+#    englishModel = UnigramLanguageModel(trainingCorpus)
 
     dictionary = parseDict(dictFile)
     spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences = parseTrainFile(translateFile)
