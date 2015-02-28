@@ -10,6 +10,7 @@ import string
 import nltk
 
 from spanishTagger import SpanishTagger
+from StupidBackoffLanguageModel import StupidBackoffLanguageModel
 
 # Set system for utf-8 endocding
 reload(sys)
@@ -112,10 +113,13 @@ def translate(spanishSentences, dictionary):
             if word == 'que':
                 if i == 0 or sentence[i-1] == 'lo':
                     translatedSentence.append('what')
+                # Is there any way we can tell this based on the tag (gender perhaps) instead of by  the specific word?
+                # This is just a very specific rule that I'm worried won't generalize well to the test set
                 elif sentence[i-1] == 'persona' or sentence[i-1] == 'personas' or sentence[i-1] == 'gente':
                     translatedSentence.append('who')
                 else:
                     translatedSentence.append('that')
+
             elif word in dictionary:
                 translatedSentence.append(dictionary[word])
             else:
@@ -291,17 +295,32 @@ def aConsonantCorrection(taggedEnglishTranslations):
 
     return updatedTranslations
 
+# Post-Process #5 look for 'the' in the sentence and use a StupidBackoffLanguage Model
+# to determine if the sentence is more or less fluent without the 'the'
+def articleCorrection(englishTranslations, englishModel):
+    updatedSentences = []
+    for sentence in englishTranslations:
+        for idx, word in enumerate(sentence):
+            if word == 'the':
+                if englishModel.score(sentence) < english.Model(sentence[0,i]+sentence[i+1,len(sentence)]):
+                    sentence.pop(idx)
+        updatedSentences.append(sentences)
+
+    return updatedSentences
+                
+
 # Post-Process #4
 
-def capitalizeFirstWord(taggedEnglishTranslations):
+def capitalizeFirstWord(englishTranslations):
     updatedTranslations = []
 
-    for sentence in taggedEnglishTranslations:
+    for sentence in englishTranslations:
         if len(sentence) > 0:
-            sentence[0] = (sentence[0][0].capitalize(), sentence[0][1])
+            sentence[0] = sentence[0].capitalize
         updatedTranslations.append(sentence)
 
     return updatedTranslations
+
 
 
 # =================================================== #
@@ -381,6 +400,9 @@ def main():
 
     spanishTagger = SpanishTagger()
 
+    # TODO: Need to create HolbrookCorpus Class using HolbrookCorpus.txt
+    englishModel = StupidBackoffLanguageModel('HolbrookCorpus.py')
+
     dictionary = parseDict(dictFile)
     spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences = parseTrainFile(translateFile)
 
@@ -404,10 +426,11 @@ def main():
     taggedEnglishTranslations = nounAdjectiveSwap(taggedEnglishTranslations)
     taggedEnglishTranslations = verbNegation(taggedEnglishTranslations)
     taggedEnglishTranslations = aConsonantCorrection(taggedEnglishTranslations)
-    taggedEnglishTranslations = capitalizeFirstWord(taggedEnglishTranslations)
 
     englishTranslations = unPosTagTranslations(taggedEnglishTranslations)
 
+    englishTranslations = articleCorrection(englishTranslations, englishModel)
+    englishTranslations = capitalizeFirstWord(englishTranslations)
 
     # Scoring
     bScores = computeBLEU(englishTranslations, englishSentences)
