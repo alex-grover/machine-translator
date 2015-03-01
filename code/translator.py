@@ -106,21 +106,24 @@ def translate(spanishSentences, dictionary):
     for sentence in spanishSentences:
         translatedSentence = []
 
-        for i, word in enumerate(sentence):
-            word = word.lower()
+        for i, tup in enumerate(sentence):
+            word = tup[0].lower()
+            tag = tup[1]
 
             if word == 'lo':
                 # lo que -> what, so disregard 'lo'
-                if len(sentence) > i+1 and sentence[i+1] == 'que':
+                if len(sentence) > i+1 and sentence[i+1][0] == 'que':
                     continue
 
             if word == 'que':
-                if i == 0 or sentence[i-1] == 'lo':
+                if i == 0 or sentence[i-1][0] == 'lo':
                     translatedSentence.append('what')
                 # Is there any way we can tell this based on the tag (gender perhaps) instead of by  the specific word?
                 # This is just a very specific rule that I'm worried won't generalize well to the test set
-                elif sentence[i-1] == 'persona' or sentence[i-1] == 'personas' or sentence[i-1] == 'gente':
+                elif sentence[i-1][0] == 'persona' or sentence[i-1][0] == 'personas' or sentence[i-1][0] == 'gente' or (sentence[i-1][1] and sentence[i-1][1][0:2] == 'np'):
                     translatedSentence.append('who')
+                elif sentence[i-1][1] and sentence[i-1][1][0] == 'v':
+                    translatedSentence.append('to')
                 else:
                     translatedSentence.append('that')
 
@@ -425,7 +428,7 @@ def main():
     directEnglishTranslations = directTranslate(spanishSentences, dictionary)
     directTranslationBScores = computeBLEU(directEnglishTranslations, englishSentences)
 
-    englishTranslations = translate(modifiedSpanishSentences, dictionary)
+    englishTranslations = translate(taggedSpanishSentences, dictionary)
 
 
     # Post-processing methods
