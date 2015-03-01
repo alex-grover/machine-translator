@@ -87,9 +87,10 @@ def directTranslate(spanishSentences, dictionary):
     for sentence in spanishSentences:
         translatedSentence = []
         for i, word in enumerate(sentence):
-            word = word.lower()
             if word in dictionary:
                 translatedSentence.append(dictionary[word])
+            elif word.lower() in dictionary:
+                translatedSentence.append(dictionary[word.lower()])
             else:
                 translatedSentence.append(word)
         translations.append(translatedSentence)
@@ -106,21 +107,24 @@ def translate(spanishSentences, dictionary):
     for sentence in spanishSentences:
         translatedSentence = []
 
-        for i, word in enumerate(sentence):
-            word = word.lower()
+        for i, tup in enumerate(sentence):
+            word = tup[0].lower()
+            tag = tup[1]
 
             if word == 'lo':
                 # lo que -> what, so disregard 'lo'
-                if len(sentence) > i+1 and sentence[i+1] == 'que':
+                if len(sentence) > i+1 and sentence[i+1][0] == 'que':
                     continue
 
             if word == 'que':
-                if i == 0 or sentence[i-1] == 'lo':
+                if i == 0 or sentence[i-1][0] == 'lo':
                     translatedSentence.append('what')
                 # Is there any way we can tell this based on the tag (gender perhaps) instead of by  the specific word?
                 # This is just a very specific rule that I'm worried won't generalize well to the test set
-                elif sentence[i-1] == 'persona' or sentence[i-1] == 'personas' or sentence[i-1] == 'gente':
+                elif sentence[i-1][0] == 'persona' or sentence[i-1][0] == 'personas' or sentence[i-1][0] == 'gente' or (sentence[i-1][1] and sentence[i-1][1][0:2] == 'np'):
                     translatedSentence.append('who')
+                elif sentence[i-1][1] and sentence[i-1][1][0] == 'v':
+                    translatedSentence.append('to')
                 else:
                     translatedSentence.append('that')
 
@@ -137,7 +141,7 @@ def translate(spanishSentences, dictionary):
 # Method computes the BLEU score for all Translations given
 # in the list englishTranslations when compared against the
 # correct translation given by englishSentences. Returns a list
-# of BLEU scores corresponding to the translations given in\
+# of BLEU scores corresponding to the translations given in
 # englishTranslations.
 def computeBLEU(englishTranslations, englishSentences):
     bScores = []
@@ -331,7 +335,7 @@ def articleCorrection(englishTranslations, englishModel):
                 new_sentence.append(word)
         updatedSentences.append(new_sentence)
     return updatedSentences
-                
+
 
 # Post-Process #4
 
@@ -435,7 +439,7 @@ def main():
     spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences = parseTrainFile(translateFile)
 
     # Pre-processing methods
-    taggedSpanishSentences = spanishPosTag(spanishTagger, spanishSentences) 
+    taggedSpanishSentences = spanishPosTag(spanishTagger, spanishSentences)
 
     taggedSpanishSentences = spanishNounAdjectiveSwap(taggedSpanishSentences)
 
@@ -445,13 +449,13 @@ def main():
     directEnglishTranslations = directTranslate(spanishSentences, dictionary)
     directTranslationBScores = computeBLEU(directEnglishTranslations, englishSentences)
 
-    englishTranslations = translate(modifiedSpanishSentences, dictionary)
+    englishTranslations = translate(taggedSpanishSentences, dictionary)
 
 
     # Post-processing methods
     taggedEnglishTranslations = posTagTranslations(englishTranslations)
 
-    taggedEnglishTranslations = nounAdjectiveSwap(taggedEnglishTranslations)
+    # taggedEnglishTranslations = nounAdjectiveSwap(taggedEnglishTranslations)
     taggedEnglishTranslations = verbNegation(taggedEnglishTranslations)
     taggedEnglishTranslations = aConsonantCorrection(taggedEnglishTranslations)
 
