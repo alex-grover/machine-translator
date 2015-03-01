@@ -193,13 +193,9 @@ def spanishNounAdjectiveSwap(taggedSpanishSentences):
                 prev = False
                 continue
 
-            # Check if Adjective (JJ) is following a noun (NN)
+            # Check if Adjective is following a noun
             if sentence[i-1][1] and sentence[i][1] and sentence[i - 1][1][0] == 'n' and sentence[i][1][0] == 'a':
-                # If it's following a verb, don't swap
-                if sentence[i - 2] and sentence[i-2][1] and sentence[i - 2][1][0] == 'v':
-                    continue
-
-                # Otherwise, swap the two words
+                # noun, adjective -> adjective, noun
                 print "Swapping Adjective-Noun in Spanish in: ", sentence
                 swapWord = sentence[i - 1]
                 sentence[i - 1] = sentence[i]
