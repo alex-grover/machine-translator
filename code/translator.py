@@ -108,15 +108,16 @@ def translate(spanishSentences, dictionary):
         translatedSentence = []
 
         for i, tup in enumerate(sentence):
-            word = tup[0].lower()
+            word = tup[0]
+            lower_word = tup[0].lower()
             tag = tup[1]
 
-            if word == 'lo':
+            if lower_word == 'lo':
                 # lo que -> what, so disregard 'lo'
                 if len(sentence) > i+1 and sentence[i+1][0] == 'que':
                     continue
 
-            if word == 'que':
+            if lower_word == 'que':
                 if i == 0 or sentence[i-1][0] == 'lo':
                     translatedSentence.append('what')
                 # Is there any way we can tell this based on the tag (gender perhaps) instead of by  the specific word?
@@ -130,6 +131,8 @@ def translate(spanishSentences, dictionary):
 
             elif word in dictionary:
                 translatedSentence.append(dictionary[word])
+            elif lower_word in dictionary:
+                translatedSentence.append(dictionary[lower_word])
             else:
                 translatedSentence.append(word)
 
@@ -194,9 +197,13 @@ def spanishNounAdjectiveSwap(taggedSpanishSentences):
                 prev = False
                 continue
 
-            # Check if Adjective is following a noun
+            # Check if Adjective (JJ) is following a noun (NN)
             if sentence[i-1][1] and sentence[i][1] and sentence[i - 1][1][0] == 'n' and sentence[i][1][0] == 'a':
-                # noun, adjective -> adjective, noun
+                # If it's following a verb, don't swap
+                if sentence[i - 2] and sentence[i-2][1] and sentence[i - 2][1][0] == 'v':
+                    continue
+
+                # Otherwise, swap the two words
                 print "Swapping Adjective-Noun in Spanish in: ", sentence
                 swapWord = sentence[i - 1]
                 sentence[i - 1] = sentence[i]
