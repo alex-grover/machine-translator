@@ -310,7 +310,7 @@ def articleCorrection(englishTranslations, englishModel):
         updatedSentences.append(sentence)
 
     return updatedSentences
-                
+
 
 # Post-Process #4
 
@@ -414,7 +414,7 @@ def main():
     spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences = parseTrainFile(translateFile)
 
     # Pre-processing methods
-    taggedSpanishSentences = spanishPosTag(spanishTagger, spanishSentences) 
+    taggedSpanishSentences = spanishPosTag(spanishTagger, spanishSentences)
 
     taggedSpanishSentences = spanishNounAdjectiveSwap(taggedSpanishSentences)
 
@@ -430,7 +430,7 @@ def main():
     # Post-processing methods
     taggedEnglishTranslations = posTagTranslations(englishTranslations)
 
-    taggedEnglishTranslations = nounAdjectiveSwap(taggedEnglishTranslations)
+    # taggedEnglishTranslations = nounAdjectiveSwap(taggedEnglishTranslations)
     taggedEnglishTranslations = verbNegation(taggedEnglishTranslations)
     taggedEnglishTranslations = aConsonantCorrection(taggedEnglishTranslations)
 

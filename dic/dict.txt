@@ -15,7 +15,7 @@ cara:face
 cautivadas:captivated
 cerebro:brain
 colores:colors
-como:how
+como:like
 computadora:computer
 con:with
 contiene:contains
