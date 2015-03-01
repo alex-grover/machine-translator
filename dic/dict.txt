@@ -8,7 +8,6 @@ alcance:reach
 algo:something
 algunos:some
 bajón:slump
-bbc:bbc
 bloquear:block
 capacidad:capacity
 cara:face

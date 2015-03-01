@@ -86,9 +86,10 @@ def directTranslate(spanishSentences, dictionary):
     for sentence in spanishSentences:
         translatedSentence = []
         for i, word in enumerate(sentence):
-            word = word.lower()
             if word in dictionary:
                 translatedSentence.append(dictionary[word])
+            elif word.lower() in dictionary:
+                translatedSentence.append(dictionary[word.lower()])
             else:
                 translatedSentence.append(word)
         translations.append(translatedSentence)
@@ -136,7 +137,7 @@ def translate(spanishSentences, dictionary):
 # Method computes the BLEU score for all Translations given
 # in the list englishTranslations when compared against the
 # correct translation given by englishSentences. Returns a list
-# of BLEU scores corresponding to the translations given in\
+# of BLEU scores corresponding to the translations given in
 # englishTranslations.
 def computeBLEU(englishTranslations, englishSentences):
     bScores = []
