@@ -14,6 +14,7 @@ from HolbrookCorpus import HolbrookCorpus
 from StupidBackoffLanguageModel import StupidBackoffLanguageModel
 from LaplaceBigramLanguageModel import LaplaceBigramLanguageModel
 from UnigramLanguageModel import UnigramLanguageModel
+from ArticleTester import ArticleTester
 
 # Set system for utf-8 endocding
 reload(sys)
@@ -298,17 +299,37 @@ def aConsonantCorrection(taggedEnglishTranslations):
 
     return updatedTranslations
 
-# Post-Process #5 look for 'the' in the sentence and use a StupidBackoffLanguage Model
+# Recursive method to generate all permutations of a sentence toggling each instance
+# of 'the'
+
+def generateThePermutations(sentence, index):
+    if index == len(sentence): return []
+    if  sentence[index] == 'the':
+        permutations = generateThePermutations(sentence, index+1)
+        permutations.append(sentence)
+        sentence = sentence[0:index] + sentence[index+1:len(sentence)]
+        permutations.append(sentence)
+        permutations += generateThePermutations(sentence, index)
+        return permutations
+    else:
+        return generateThePermutations(sentence, index+1)
+
+# Post-Process #5 look for 'the' in the sentence and use a Bigram Model
 # to determine if the sentence is more or less fluent without the 'the'
+
 def articleCorrection(englishTranslations, englishModel):
     updatedSentences = []
     for sentence in englishTranslations:
+        new_sentence = []
         for idx, word in enumerate(sentence):
             if word == 'the':
-                if englishModel.score(sentence) < englishModel.score(sentence[0:idx]+sentence[idx+1:len(sentence)]):
-                    del sentence[idx]
-        updatedSentences.append(sentence)
-
+                score = englishModel.score(sentence[idx: idx+2])
+                print "Score: ", score
+                if score >= 0.5:
+                    new_sentence.append(word)
+            else:
+                new_sentence.append(word)
+        updatedSentences.append(new_sentence)
     return updatedSentences
                 
 
@@ -403,11 +424,11 @@ def main():
 
     spanishTagger = SpanishTagger()
 
-    # TODO: Need to create HolbrookCorpus Class using HolbrookCorpus.txt
     trainPath = '../data/holbrook-tagged-train.dat'
     trainingCorpus = HolbrookCorpus(trainPath)
+    englishModel = ArticleTester(trainingCorpus)
 #    englishModel = StupidBackoffLanguageModel(trainingCorpus)
-    englishModel = LaplaceBigramLanguageModel(trainingCorpus)
+#    englishModel = LaplaceBigramLanguageModel(trainingCorpus)
 #    englishModel = UnigramLanguageModel(trainingCorpus)
 
     dictionary = parseDict(dictFile)
