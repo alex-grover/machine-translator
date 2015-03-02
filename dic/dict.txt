@@ -120,9 +120,9 @@ sentí:I felt
 ser:be
 si:yes
 sin:without
-su:thier
+su:their
 sufren:suffer
-sus:theirs
+sus:their
 te:tea
 tener:have
 tienen:have
