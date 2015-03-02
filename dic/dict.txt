@@ -120,7 +120,7 @@ sentí:I felt
 ser:be
 si:yes
 sin:without
-su:thier
+su:their
 sufren:suffer
 sus:theirs
 te:tea
