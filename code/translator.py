@@ -127,7 +127,8 @@ def translate(spanishSentences, dictionary):
                     translatedSentence.append('to')
                 else:
                     translatedSentence.append('that')
-
+            elif i > 0 and isDirectObject(word) and sentence[i][1] and sentence[i][1] == 'o' and sentence[i-1][1] and sentence[i-1][1][0] == 'v':
+                translatedSentence.append(wordForDirectObject(word))
             elif word in dictionary:
                 translatedSentence.append(dictionary[word])
             else:
@@ -205,6 +206,44 @@ def spanishNounAdjectiveSwap(taggedSpanishSentences):
 
         updatedSentences.append(sentence)
 
+    return updatedSentences
+
+def isDirectObject(word):
+    return word == 'me' or word == 'te' or word == 'lo' or word == 'la' or word == 'nos' or word == 'os' or word == 'los' or word == 'las'
+
+def wordForDirectObject(word):
+    if word == 'me':
+        return 'me'
+    elif word == 'te':
+        return 'you'
+    elif word == 'lo' or word == 'la':
+        return 'it'
+    elif word == 'nos':
+        return 'us'
+    elif word == 'os':
+        return 'you'
+    elif word == 'los' or word == 'las':
+        return 'them'
+    else:
+        return word
+
+def spanishVerbObjectSwap(taggedSpanishSentences):
+    updatedSentences = []
+
+    for sentence in taggedSpanishSentences:
+        prev = False
+
+        for i in xrange(1, len(sentence)):
+            if prev:
+                prev = False
+                continue
+
+            if isDirectObject(sentence[i-1][0]) and sentence[i][1] and sentence[i][1][0] == 'v':
+                swapWord = sentence[i-1][0]
+                sentence[i-1] = sentence[i]
+                sentence[i] = (swapWord, 'o')
+                prev = True
+        updatedSentences.append(sentence)
     return updatedSentences
 
 
@@ -438,6 +477,8 @@ def main():
     taggedSpanishSentences = spanishPosTag(spanishTagger, spanishSentences)
 
     taggedSpanishSentences = spanishNounAdjectiveSwap(taggedSpanishSentences)
+
+    taggedSpanishSentences = spanishVerbObjectSwap(taggedSpanishSentences)
 
     modifiedSpanishSentences = spanishUnPosTag(taggedSpanishSentences)
 
