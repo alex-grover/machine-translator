@@ -11,12 +11,14 @@ python
 
 And download all from the website.
 
+From the `code/` directory:
+
 To run on the dev set:
 ```bash
-python code/translator.py dic/dict.txt corpus/dev.txt
+python translator.py ../dic/dict.txt ../corpus/dev.txt
 ```
 
 To run on the test set:
 ```bash
-python code/translator.py dic/dict.txt corpus/test.txt
+python translator.py ../dic/dict.txt ../corpus/test.txt
 ```
