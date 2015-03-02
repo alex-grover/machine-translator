@@ -117,7 +117,7 @@ def translate(spanishSentences, dictionary):
                 if len(sentence) > i+1 and sentence[i+1][0] == 'que':
                     continue
 
-            if lower_word == 'que':
+            elif lower_word == 'que':
                 if i == 0 or sentence[i-1][0] == 'lo':
                     translatedSentence.append('what')
                 # Is there any way we can tell this based on the tag (gender perhaps) instead of by  the specific word?
@@ -205,7 +205,6 @@ def spanishNounAdjectiveSwap(taggedSpanishSentences):
                     continue
 
                 # Otherwise, swap the two words
-                print "Swapping Adjective-Noun in Spanish in: ", sentence
                 swapWord = sentence[i - 1]
                 sentence[i - 1] = sentence[i]
                 sentence[i] = swapWord
@@ -370,7 +369,6 @@ def articleCorrection(englishTranslations, englishModel):
         for idx, word in enumerate(sentence):
             if word == 'the':
                 score = englishModel.score(sentence[idx: idx+2])
-                print "Score: ", score
                 if score >= 0.5:
                     new_sentence.append(word)
             else:
@@ -400,7 +398,6 @@ def spanishPosTag(spanishTagger, spanishSentences):
     posTaggedSentences = []
     for sentence in spanishSentences:
         posTaggedSentences.append(spanishTagger.tagSentence(sentence))
-        print 'Spanish Tagged Sentence: ', posTaggedSentences[-1]
     return posTaggedSentences
 
 def spanishUnPosTag(spanishTagSentences):
@@ -473,9 +470,6 @@ def main():
     trainPath = '../data/holbrook-tagged-train.dat'
     trainingCorpus = HolbrookCorpus(trainPath)
     englishModel = ArticleTester(trainingCorpus)
-#    englishModel = StupidBackoffLanguageModel(trainingCorpus)
-#    englishModel = LaplaceBigramLanguageModel(trainingCorpus)
-#    englishModel = UnigramLanguageModel(trainingCorpus)
 
     dictionary = parseDict(dictFile)
     spanishSentences, englishSentences, rawEnglishSentences, rawSpanishSentences = parseTrainFile(translateFile)
@@ -499,7 +493,6 @@ def main():
     # Post-processing methods
     taggedEnglishTranslations = posTagTranslations(englishTranslations)
 
-    # taggedEnglishTranslations = nounAdjectiveSwap(taggedEnglishTranslations)
     taggedEnglishTranslations = verbNegation(taggedEnglishTranslations)
     taggedEnglishTranslations = aConsonantCorrection(taggedEnglishTranslations)
 

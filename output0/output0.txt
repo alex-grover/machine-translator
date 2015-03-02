@@ -1,0 +1,51 @@
+Translation of:  ¿Puede una luz tener el efecto de una droga ?
+Translation:  ¿Puede a light have the effect of a drug ?
+Correct Translation:  Can a light have the effect of a drug ?
+
+Translation of:  La meditación es una habilidad que no está al alcance de todos .
+Translation:  the meditation is a ability what no is to the reach of all .
+Correct Translation:  Meditation is a skill that is not within everyone 's reach .
+
+Translation of:  El video contiene imágenes de una luz intermitente extremadamente rápida y no debe ser visto por personas que tienen epilepsia .
+Translation:  the video contains images of a light intermittent extremely fast and no should be viewed by people what have epilepsy .
+Correct Translation:  The video contains images of an extremely fast flashing light and should not be seen by people who have epilepsy .
+
+Translation of:  La luz , dirigida a la cara de la persona , estimula la glándula pineal del cerebro .
+Translation:  the light , directed to the face of the person , stimulates the gland pineal of brain .
+Correct Translation:  The light , directed at the face of the person , stimulates the pineal gland of the brain .
+
+Translation of:  Un poco como drogarse , pero sin el bajón y la mandíbula dolorida .
+Translation:  a little like drugging , but without the slump and the jaw sore .
+Correct Translation:  A little bit like getting high , but without the crash and the sore jaw .
+
+Translation of:  Obviamente la gente puede ser escéptica porque es algo nuevo .
+Translation:  obviously the people can be skeptical because is something new .
+Correct Translation:  Obviously people can be skeptical because it is something new .
+
+Translation of:  En una demostración con algunos empleados de la BBC , algunos dijeron sentir picazón en los ojos y una sensación de sacudida que los hizo sentirse incómodos .
+Translation:  in a demonstration with some employees of the BBC , some said feel itching in the eyes and a feeling of seizure what the made feel uncomfortable .
+Correct Translation:  In a demonstration with some BBC employees , some said they felt itchy eyes and a sense of shock that made them feel uncomfortable .
+
+Translation of:  Sin embargo , le dijo a la BBC que el 99 % de las personas que utilizan la luz quedan cautivadas por lo que experimentaron porque es muy diferente de la realidad y lo disfrutan .
+Translation:  without however , the said to the BBC what the 99 % of the people what used the light remain captivated by the what experienced because is very different of the reality and the enjoy .
+Correct Translation:  However , he told the BBC that 99 % of the people that use the light are captivated by what they experienced because it is very different from reality and they enjoy it .
+
+Translation of:  Un zumbido de colores y formas .
+Translation:  a buzz of colors and forms .
+Correct Translation:  A buzz of colors and shapes .
+
+Translation of:  Actúa como una especie de vía rápida para las personas que quieren llegar a ese tipo de estado .
+Translation:  acts like a species of way fast for the people what want arrive to that type of state .
+Correct Translation:  It acts as a kind of fast track for people who want to get to that type of state .
+
+Summary: 
+Sentence:  1  Direct Translation Score:  0.8  vs. Final Score:  0.8
+Sentence:  2  Direct Translation Score:  0.0384615384615  vs. Final Score:  0.0384615384615
+Sentence:  3  Direct Translation Score:  0.32380952381  vs. Final Score:  0.32380952381
+Sentence:  4  Direct Translation Score:  0.526315789474  vs. Final Score:  0.526315789474
+Sentence:  5  Direct Translation Score:  0.230769230769  vs. Final Score:  0.230769230769
+Sentence:  6  Direct Translation Score:  0.572727272727  vs. Final Score:  0.572727272727
+Sentence:  7  Direct Translation Score:  0.22619047619  vs. Final Score:  0.22619047619
+Sentence:  8  Direct Translation Score:  0.257936507937  vs. Final Score:  0.257936507937
+Sentence:  9  Direct Translation Score:  0.428571428571  vs. Final Score:  0.428571428571
+Sentence:  10  Direct Translation Score:  0.180555555556  vs. Final Score:  0.180555555556
