@@ -1,0 +1,26 @@
+Translation of:  Esa capacidad de bloquear el mundo que te rodea y relajarse .
+Translation:  That capacity of block world that surrounding you and relax .
+Correct Translation:  That ability to block out the world around you and relax .
+
+Translation of:  La luz está emparejada con un programa de computadora que genera la secuencia de luces y la vincula con la música .
+Translation:  The light is paired with a program of computer that generates the sequence of lights and the links with the music .
+Correct Translation:  The light is paired with a computer program that generates the sequence of lights and links it to music .
+
+Translation of:  Además , los inventores advierten contra el uso por personas que sufren de psicosis .
+Translation:  Further , the inventors warn against the use by people who suffer of psychosis .
+Correct Translation:  Furthermore , the inventors warn against use by people suffering from psychosis .
+
+Translation of:  Otros , por su parte , describieron sentirse fuera de sus cuerpos y experimentar una profunda relajación .
+Translation:  Others , by their part , described feel out of their bodies and experience a deep relaxation .
+Correct Translation:  Others , for their part , described feeling out of their bodies and experience deep relaxation .
+
+Translation of:  Me sentí ingrávida , no me podía acordar si estaba sentada o de pie porque no podía sentir mi cuerpo .
+Translation:  Me I felt weightless , no me could agree yes was sitting or of foot because could not feel my body .
+Correct Translation:  I felt weightless , I could not decide whether I was sitting or standing because I could not feel my body .
+
+Summary: 
+Sentence:  1  Direct Translation Score:  0.136363636364  vs. Final Score:  0.175
+Sentence:  2  Direct Translation Score:  0.34632034632  vs. Final Score:  0.467532467532
+Sentence:  3  Direct Translation Score:  0.4  vs. Final Score:  0.433333333333
+Sentence:  4  Direct Translation Score:  0.575163398693  vs. Final Score:  0.666666666667
+Sentence:  5  Direct Translation Score:  0.238636363636  vs. Final Score:  0.306818181818
